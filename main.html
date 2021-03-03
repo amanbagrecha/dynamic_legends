@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Update a choropleth layer by zoom level</title>
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <style>
+      .legend {
+        background-color: rgb(251, 169, 169);
+        border-radius: 3px;
+        bottom: 30px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+        padding: 10px;
+        position: absolute;
+        right: 10px;
+        z-index: 1;
+      }
+
+      .legend h4 {
+        margin: 0 0 10px;
+      }
+
+      .legend div span {
+        border-radius: 50%;
+        display: inline-block;
+        height: 10px;
+        margin-right: 5px;
+        width: 10px;
+      }
+    </style>
+
+    <div id="map"></div>
+
+    <div id="main" class="legend"></div>
+
+    <script>
+      var data = {
+        type: "FeatureCollection",
+        features: [
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [-0.1428115, 51.5125168],
+            },
+            type: "Feature",
+            properties: {
+              category: "patisserie",
+              hours: "10am - 6pm",
+              description:
+                "Modern twists on classic pastries. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Patisserie Mayfair",
+              phone: "+44 20 1234 5678",
+              storeid: "01",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [-2.579623, 51.452251],
+            },
+            type: "Feature",
+            properties: {
+              category: "patisserie",
+              hours: "10am - 6pm",
+              description:
+                "Come and try our award-winning cakes and pastries. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Patisserie Bristol",
+              phone: "+44 117 121 2121",
+              storeid: "02",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [1.273459, 52.638072],
+            },
+            type: "Feature",
+            properties: {
+              category: "patisserie",
+              hours: "10am - 6pm",
+              description:
+                "Whatever the occasion, whether it's a birthday or a wedding, Josie's Patisserie has the perfect treat for you. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Patisserie Norwich",
+              phone: "+44 1603 123456",
+              storeid: "03",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [-1.9912838, 50.8000418],
+            },
+            type: "Feature",
+            properties: {
+              category: "patisserie",
+              hours: "10am - 6pm",
+              description:
+                "A gourmet patisserie that will delight your senses. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Patisserie Wimborne",
+              phone: "+44 1202 343434",
+              storeid: "04",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [-2.985933, 53.408899],
+            },
+            type: "Feature",
+            properties: {
+              category: "patisserie",
+              hours: "10am - 6pm",
+              description:
+                "Spoil yourself or someone special with our classic pastries. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Patisserie Liverpool",
+              phone: "+44 151 444 4444",
+              storeid: "05",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [-1.689423, 52.632469],
+            },
+            type: "Feature",
+            properties: {
+              category: "patisserie",
+              hours: "10am - 6pm",
+              description:
+                "Come and feast your eyes and tastebuds on our delicious pastries and cakes. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Patisserie Tamworth",
+              phone: "+44 5555 55555",
+              storeid: "06",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [-3.155305, 51.479756],
+            },
+            type: "Feature",
+            properties: {
+              category: "patisserie",
+              hours: "10am - 6pm",
+              description:
+                "Josie's Patisserie is family-owned, and our delectable pastries, cakes, and great coffee are renowed. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Patisserie Cardiff",
+              phone: "+44 29 6666 6666",
+              storeid: "07",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [-0.725019, 52.668891],
+            },
+            type: "Feature",
+            properties: {
+              category: "cafe",
+              hours: "8am - 9:30pm",
+              description:
+                "Oakham's favorite spot for fresh coffee and delicious cakes. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Cafe Oakham",
+              phone: "+44 7777 777777",
+              storeid: "08",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [-2.477653, 53.735405],
+            },
+            type: "Feature",
+            properties: {
+              category: "cafe",
+              hours: "8am - 9:30pm",
+              description:
+                "Enjoy freshly brewed coffe, and home baked cakes in our homely cafe. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Cafe Blackburn",
+              phone: "+44 8888 88888",
+              storeid: "09",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [-0.211363, 51.108966],
+            },
+            type: "Feature",
+            properties: {
+              category: "cafe",
+              hours: "8am - 9:30pm",
+              description:
+                "A delicious array of pastries with many flavours, and fresh coffee in an snug cafe. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Cafe Crawley",
+              phone: "+44 1010 101010",
+              storeid: "10",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [-0.123559, 50.832679],
+            },
+            type: "Feature",
+            properties: {
+              category: "cafe",
+              hours: "8am - 9:30pm",
+              description:
+                "Grab a freshly brewed coffee, a decadent cake and relax in our idyllic cafe. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Cafe Brighton",
+              phone: "+44 1313 131313",
+              storeid: "11",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [-3.319575, 52.517827],
+            },
+            type: "Feature",
+            properties: {
+              category: "cafe",
+              hours: "8am - 9:30pm",
+              description:
+                "Come in and unwind at this idyllic cafe with fresh coffee and home made cakes. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Cafe Newtown",
+              phone: "+44 1414 141414",
+              storeid: "12",
+            },
+          },
+          {
+            geometry: {
+              type: "Point",
+              coordinates: [1.158167, 52.071634],
+            },
+            type: "Feature",
+            properties: {
+              category: "cafe",
+              hours: "8am - 9:30pm",
+              description:
+                "Fresh coffee and delicious cakes in an snug cafe. We're part of a larger chain of patisseries and cafes.",
+              name: "Josie's Cafe Ipswich",
+              phone: "+44 1717 17171",
+              storeid: "13",
+            },
+          },
+        ],
+      };
+
+      mapboxgl.accessToken =
+        "pk.eyJ1IjoibWFkaHUtOTk2MCIsImEiOiJja2Fyc3pxcnowZDEyMnFucXVkNzZlMTE3In0.n8jgSHmV-s6X3gkFPFf2RA";
+      var map = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: [0.1278, 51.5074],
+        minZoom: 5,
+        zoom: 5,
+      });
+      map.on("load", function () {
+        map.addSource("stores", {
+          type: "geojson",
+          data: data,
+        });
+        // var zoomThreshold =13;
+        map.addLayer({
+          id: "store-catogory",
+          source: "stores",
+          type: "circle",
+          paint: {
+            "circle-color": [
+              "match",
+              ["get", "category"],
+              "cafe",
+              "#F2F12D",
+              "patisserie",
+              "#e83333",
+              "#efefef",
+            ],
+          },
+        });
+
+        var layer_length = map.getStyle().layers.length;
+        for (var j = 0; j < layer_length; j++) {
+          try {
+            if (map.getStyle().layers[j].type == "symbol") {
+              color = "text";
+            } else {
+              color = map.getStyle().layers[j].type;
+            }
+            layer = map.getStyle().layers[j].paint;
+
+            if (!Array.isArray(layer[color + "-color"])) {
+              span_tag = document.createElement("span");
+              board = document.createElement("div");
+              span_tag.style.backgroundColor = layer[color + "-color"];
+              board.innerHTML = map.getStyle().layers[j].id;
+              board.appendChild(span_tag);
+              console.log(board);
+              document.getElementById("main").appendChild(board);
+            } else {
+              if (layer[color + "-color"][0] == "interpolate") {
+                var w = 2;
+              } else if (layer[color + "-color"][0] == "step") {
+                var w = 0;
+              } else {
+                var w = 1;
+              }
+
+              item = map.getStyle().layers[j].id;
+              document
+                .getElementById("main")
+                .insertAdjacentHTML("beforeend", `<h1>${item}</h1>`);
+              for (
+                var k = w;
+                k < layer[color + "-color"].length - 2;
+                k = k + 2
+              ) {
+                span_elem = document.createElement("span");
+                console.log(j, k);
+                span_elem.style.backgroundColor =
+                  layer[color + "-color"][k + 2];
+                div_elem = document.createElement("div");
+                div_elem.innerHTML = layer[color + "-color"][k + 1];
+                div_elem.appendChild(span_elem);
+                console.log(div_elem);
+                document.getElementById("main").appendChild(div_elem);
+              }
+            }
+          } catch (error) {
+            console.log(error.message);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
